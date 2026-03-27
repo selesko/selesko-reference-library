@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Selesko Studio — Reference Library</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Sidebar -->
+    <aside id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">SELESKO<br><span>STUDIO</span></div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <div class="nav-label">LIBRARY</div>
+          <a href="#" class="nav-item active" data-view="library" data-folder="">
+            <span class="nav-icon">◈</span> All Images
+            <span class="nav-count" id="total-count">—</span>
+          </a>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-label">FOLDERS</div>
+          <div id="folder-list"></div>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-label">MOODBOARDS</div>
+          <div id="moodboard-list"></div>
+          <button class="btn-new-moodboard" id="btn-new-moodboard">+ New Moodboard</button>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="btn-autotag" id="btn-autotag">
+          <span>✦</span> Auto-Tag All
+        </button>
+        <div id="autotag-status" class="autotag-status hidden"></div>
+      </div>
+    </aside>
+
+    <!-- Main content -->
+    <main id="main">
+      <!-- Toolbar -->
+      <div id="toolbar">
+        <div class="toolbar-left">
+          <h1 id="view-title">All Images</h1>
+        </div>
+        <div class="toolbar-center">
+          <div class="search-wrap">
+            <input type="text" id="search-input" placeholder="Search by name or tag…">
+            <span class="search-icon">⌕</span>
+          </div>
+        </div>
+        <div class="toolbar-right">
+          <div id="selection-bar" class="hidden">
+            <span id="selection-count">0 selected</span>
+            <button class="btn-action" id="btn-add-to-moodboard">Add to Moodboard</button>
+            <button class="btn-action btn-clear" id="btn-clear-selection">✕ Clear</button>
+          </div>
+          <div class="view-toggles">
+            <button class="view-toggle active" data-grid="4" title="Large grid">▣</button>
+            <button class="view-toggle" data-grid="6" title="Medium grid">⊞</button>
+            <button class="view-toggle" data-grid="8" title="Small grid">⊟</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tag filter bar -->
+      <div id="tag-filter-bar">
+        <div id="active-tag-filters"></div>
+        <div id="all-tags-container">
+          <div id="tag-cloud"></div>
+        </div>
+      </div>
+
+      <!-- Image grid -->
+      <div id="grid-container">
+        <div id="image-grid"></div>
+        <div id="load-more-trigger"></div>
+        <div id="empty-state" class="hidden">
+          <p>No images found</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Lightbox -->
+  <div id="lightbox" class="hidden">
+    <div class="lightbox-backdrop" id="lightbox-backdrop"></div>
+    <div class="lightbox-content">
+      <button class="lightbox-close" id="lightbox-close">✕</button>
+      <button class="lightbox-prev" id="lightbox-prev">‹</button>
+      <button class="lightbox-next" id="lightbox-next">›</button>
+      <div class="lightbox-image-wrap">
+        <img id="lightbox-img" src="" alt="">
+      </div>
+      <div class="lightbox-panel">
+        <div class="lightbox-info">
+          <div class="lightbox-filename" id="lightbox-filename"></div>
+          <div class="lightbox-folder" id="lightbox-folder"></div>
+        </div>
+        <div class="lightbox-tags">
+          <div class="tags-header">Tags</div>
+          <div id="lightbox-tag-list"></div>
+          <div class="tag-input-wrap">
+            <input type="text" id="lightbox-tag-input" placeholder="Add tag…">
+            <button id="lightbox-tag-add">Add</button>
+          </div>
+          <button class="btn-autotag-single" id="btn-autotag-single">✦ Auto-tag this image</button>
+        </div>
+        <div class="lightbox-moodboards">
+          <div class="tags-header">Add to Moodboard</div>
+          <div id="lightbox-moodboard-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- New Moodboard Modal -->
+  <div id="modal-new-moodboard" class="modal hidden">
+    <div class="modal-backdrop"></div>
+    <div class="modal-box">
+      <h3>New Moodboard</h3>
+      <input type="text" id="moodboard-name-input" placeholder="Name…" autofocus>
+      <textarea id="moodboard-desc-input" placeholder="Description (optional)"></textarea>
+      <div class="modal-actions">
+        <button class="btn-primary" id="btn-create-moodboard">Create</button>
+        <button class="btn-secondary" id="btn-cancel-moodboard">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add to Moodboard Modal -->
+  <div id="modal-add-to-moodboard" class="modal hidden">
+    <div class="modal-backdrop"></div>
+    <div class="modal-box">
+      <h3>Add to Moodboard</h3>
+      <div id="modal-moodboard-list"></div>
+      <div class="modal-actions">
+        <button class="btn-secondary" id="btn-cancel-add-moodboard">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
