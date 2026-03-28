@@ -3,7 +3,7 @@
   "version": "2.0.0",
   "description": "Selesko Studio Reference Image Library — Vercel + Supabase",
   "scripts": {
-    "dev": "vercel dev",
+    "start": "vercel dev",
     "upload": "node scripts/upload.js",
     "watch": "node scripts/watch.js"
   },

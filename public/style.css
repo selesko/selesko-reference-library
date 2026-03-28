@@ -290,7 +290,11 @@ body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: 
 .tag-filter-chip .remove { font-size: 10px; opacity: 0.7; }
 .tag-filter-chip .remove:hover { opacity: 1; }
 
-#tag-cloud { display: flex; flex-wrap: wrap; gap: 3px; }
+#tag-cloud { display: flex; flex-direction: column; gap: 12px; width: 100%; }
+
+.tag-category-group { display: flex; flex-direction: column; gap: 6px; }
+.tag-category-title { font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-dim); font-weight: 600; }
+.tag-category-content { display: flex; flex-wrap: wrap; gap: 4px; }
 .tag-pill {
   display: inline-block;
   padding: 2px 8px;

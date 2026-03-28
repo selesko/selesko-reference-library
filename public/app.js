@@ -1,3 +1,15 @@
+/* ── Taxonomy ── */
+const TAXONOMY = {
+  "Space": ["kitchen", "bathroom", "bedroom", "living-room", "dining", "entry-foyer", "office-study", "staircase", "hallway", "exterior-facade", "courtyard", "rooftop", "landscape-garden", "lobby", "common-area"],
+  "Building Type": ["single-family", "multi-family", "cabin"],
+  "Material": ["wood", "concrete", "brick", "steel-metal", "glass", "stone", "tile", "brass-bronze", "plaster", "rammed-earth", "terrazzo", "textile-fabric", "leather"],
+  "Style": ["mid-century", "rustic", "scandinavian", "industrial", "minimalist", "brutalist", "contemporary", "traditional", "organic-biophilic", "eco-sustainable", "japandi", "craftsman"],
+  "Mood": ["warm", "cool-calm", "moody-dark", "bright-airy", "cozy", "bold-dramatic", "serene", "raw-unfinished"],
+  "Element / Detail": ["millwork", "cabinetry", "joinery", "hardware", "fireplace", "ceiling", "flooring", "aperture-window", "door", "railing", "overhang", "facade-screen", "roofline"],
+  "Lighting": ["clerestory", "skylight", "dappled-light", "indirect-light", "shadow-play", "task-lighting", "statement-fixture"],
+  "Context / Site": ["urban", "suburban", "rural", "alpine", "high-desert", "coastal", "forest", "steep-slope"]
+};
+
 /* ── State ── */
 const state = {
   folder: '',
@@ -309,14 +321,64 @@ async function loadTags() {
 }
 function renderTagCloud() {
   $tagCloud.innerHTML = '';
-  state.allTags.slice(0, 60).forEach(t => {
-    if (state.tags.includes(t.name)) return;
+  
+  // Group tags by taxonomy
+  const groupedTags = {};
+  const otherTags = [];
+  
+  state.allTags.forEach(t => {
+    let assigned = false;
+    for (const [category, tags] of Object.entries(TAXONOMY)) {
+      if (tags.includes(t.name)) {
+        if (!groupedTags[category]) groupedTags[category] = [];
+        groupedTags[category].push(t);
+        assigned = true;
+        break;
+      }
+    }
+    if (!assigned) otherTags.push(t);
+  });
+
+  const generatePill = (t) => {
+    if (state.tags.includes(t.name)) return null;
     const pill = document.createElement('span');
     pill.className = 'tag-pill';
     pill.innerHTML = `${t.name}${t.count > 0 ? `<span class="count">${t.count}</span>` : ''}`;
     pill.addEventListener('click', () => addTagFilter(t.name));
-    $tagCloud.appendChild(pill);
-  });
+    return pill;
+  };
+
+  const renderGroup = (title, tags) => {
+    if (!tags || tags.length === 0) return;
+    
+    const availableTags = tags.filter(t => !state.tags.includes(t.name));
+    if (availableTags.length === 0) return;
+
+    const group = document.createElement('div');
+    group.className = 'tag-category-group';
+    
+    const header = document.createElement('div');
+    header.className = 'tag-category-title';
+    header.textContent = title;
+    group.appendChild(header);
+
+    const content = document.createElement('div');
+    content.className = 'tag-category-content';
+    availableTags.forEach(t => {
+      const pill = generatePill(t);
+      if (pill) content.appendChild(pill);
+    });
+    group.appendChild(content);
+    $tagCloud.appendChild(group);
+  };
+
+  // Render defined categories first
+  for (const category of Object.keys(TAXONOMY)) {
+    renderGroup(category, groupedTags[category] || []);
+  }
+  
+  // Render Other
+  renderGroup('Other', otherTags);
 }
 function addTagFilter(tag) {
   if (!state.tags.includes(tag)) navigate({ tags: [...state.tags, tag], folder: state.folder, search: state.search, moodboard: state.moodboard });
@@ -463,7 +525,8 @@ document.addEventListener('keydown', e => {
 /* ── Auto-Tag All (client-driven batch) ── */
 $('btn-autotag').addEventListener('click', async () => {
   if (state.autotagRunning) return;
-  const confirmed = confirm('This will use Claude AI to auto-tag all untagged images.\nImages must be uploaded to Supabase Storage first.\n\nContinue?');
+  const providerName = state.provider === 'gemini' ? 'Gemini AI' : 'Claude AI';
+  const confirmed = confirm(`This will use ${providerName} to auto-tag all untagged images.\nImages must be uploaded to Supabase Storage first.\n\nContinue?`);
   if (!confirmed) return;
 
   state.autotagRunning = true;
