@@ -25,6 +25,14 @@ function isImage(filename) {
   return IMAGE_EXTS.has(path.extname(filename).toLowerCase());
 }
 
+function sanitizeKey(key) {
+  return key
+    .replace(/\u202f/g, ' ') // Mac narrow no-break space
+    .replace(/—/g, '-')      // Em-dash
+    .replace(/[^\x20-\x7E]/g, '-') // Any non-ASCII
+    .replace(/[\*\?\":<>|]/g, '-'); // System reserved
+}
+
 // Wait for a file to stabilise before reading it (Google Drive can write slowly)
 function waitForFile(filePath, timeout = 10000) {
   return new Promise((resolve, reject) => {
@@ -69,18 +77,19 @@ async function handleNewImage(fullPath) {
   await waitForFile(fullPath);
 
   const fileBuffer = fs.readFileSync(fullPath);
+  const storagePath = sanitizeKey(relativePath);
 
   // Upload original
   const { error: uploadErr } = await supabase.storage
     .from('images')
-    .upload(relativePath, fileBuffer, { contentType: 'image/jpeg', upsert: false });
+    .upload(storagePath, fileBuffer, { contentType: 'image/jpeg', upsert: false });
 
   if (uploadErr && uploadErr.message !== 'The resource already exists') {
     throw new Error(`Storage upload failed: ${uploadErr.message}`);
   }
 
   // Generate + upload thumbnail
-  const thumbPath = relativePath.replace(/\.[^.]+$/, '.jpg');
+  const thumbPath = sanitizeKey(relativePath.replace(/\.[^.]+$/, '.jpg'));
   try {
     const thumbBuffer = await sharp(fullPath)
       .resize(600, 600, { fit: 'cover', position: 'centre' })
@@ -95,7 +104,7 @@ async function handleNewImage(fullPath) {
   }
 
   // Get public URLs
-  const { data: imgUrl }   = supabase.storage.from('images').getPublicUrl(relativePath);
+  const { data: imgUrl }   = supabase.storage.from('images').getPublicUrl(storagePath);
   const { data: thumbUrl } = supabase.storage.from('thumbnails').getPublicUrl(thumbPath);
 
   // Dimensions + filesize

@@ -8,6 +8,9 @@
  */
 
 require('dotenv').config();
+if (!process.env.SUPABASE_URL) {
+  require('dotenv').config({ path: '.env.local' });
+}
 const fs   = require('fs');
 const path = require('path');
 const { createClient } = require('@supabase/supabase-js');
@@ -20,6 +23,14 @@ const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SER
 
 function isImage(filename) {
   return IMAGE_EXTS.has(path.extname(filename).toLowerCase());
+}
+
+function sanitizeKey(key) {
+  return key
+    .replace(/\u202f/g, ' ') // Mac narrow no-break space
+    .replace(/—/g, '-')      // Em-dash
+    .replace(/[^\x20-\x7E]/g, '-') // Any non-ASCII
+    .replace(/[\*\?\":<>|]/g, '-'); // System reserved
 }
 
 function scanDirectory(dir, rootDir) {
@@ -52,7 +63,7 @@ async function uploadImage(file, existingPaths) {
   }
 
   const fileBuffer = fs.readFileSync(file.fullPath);
-  const storagePath = file.relativePath; // e.g. "01 Exteriors/my-image.jpg"
+  const storagePath = sanitizeKey(file.relativePath); 
 
   // Upload original
   const { error: uploadErr } = await supabase.storage
@@ -74,7 +85,7 @@ async function uploadImage(file, existingPaths) {
     console.warn(`  ⚠ Thumbnail failed for ${file.filename}: ${e.message}`);
   }
 
-  const thumbPath = storagePath.replace(/\.[^.]+$/, '.jpg');
+  const thumbPath = sanitizeKey(file.relativePath.replace(/\.[^.]+$/, '.jpg'));
   if (thumbBuffer) {
     await supabase.storage
       .from('thumbnails')

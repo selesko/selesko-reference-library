@@ -6,3 +6,5 @@
 *.db
 data/
 thumbnails/
+.vercel
+.env*.local

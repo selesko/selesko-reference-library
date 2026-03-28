@@ -1,4 +1,5 @@
 const Anthropic = require('@anthropic-ai/sdk');
+const genAI = require('../../lib/gemini');
 const supabase = require('../../lib/supabase');
 
 const SYSTEM_PROMPT = `You are an expert architectural image tagger for Selesko Studio, a design firm.
@@ -31,10 +32,44 @@ RULES:
 
 Example: ["living-room", "single-family", "wood", "concrete", "minimalist", "warm", "dappled-light", "aperture-window"]`;
 
+async function callClaude(base64, mediaType) {
+  if (!process.env.ANTHROPIC_API_KEY) throw new Error('ANTHROPIC_API_KEY not set');
+  const client = new Anthropic();
+  const response = await client.messages.create({
+    model: 'claude-haiku-4-5-20251001',
+    max_tokens: 256,
+    system: SYSTEM_PROMPT,
+    messages: [{
+      role: 'user',
+      content: [
+        { type: 'image', source: { type: 'base64', media_type: mediaType, data: base64 } },
+        { type: 'text', text: 'Tag this image.' },
+      ],
+    }],
+  });
+  return response.content[0].text.trim();
+}
+
+async function callGemini(base64, mediaType) {
+  if (!process.env.GEMINI_API_KEY) throw new Error('GEMINI_API_KEY not set');
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+  const result = await model.generateContent([
+    SYSTEM_PROMPT,
+    {
+      inlineData: {
+        data: base64,
+        mimeType: mediaType
+      }
+    },
+    "Tag this image."
+  ]);
+  return result.response.text().trim();
+}
+
 // GET  /api/autotag/:id  — return untagged image count (when id = "untagged")
-// POST /api/autotag/:id  — tag a single image by ID
+// POST /api/autotag/:id?provider=claude|gemini  — tag a single image by ID
 module.exports = async function handler(req, res) {
-  const { id } = req.query;
+  const { id, provider = 'claude' } = req.query;
 
   // Special route: GET /api/autotag/untagged — returns IDs of untagged images
   if (req.method === 'GET' && id === 'untagged') {
@@ -54,10 +89,6 @@ module.exports = async function handler(req, res) {
 
   if (req.method !== 'POST') return res.status(405).end();
 
-  if (!process.env.ANTHROPIC_API_KEY) {
-    return res.status(500).json({ error: 'ANTHROPIC_API_KEY not set' });
-  }
-
   try {
     // Fetch image record
     const { data: img, error: imgErr } = await supabase
@@ -72,7 +103,7 @@ module.exports = async function handler(req, res) {
     // Download image from Supabase Storage
     const { data: fileData, error: dlErr } = await supabase.storage
       .from('images')
-      .download(img.storage_path.replace('images/', ''));
+      .download(img.storage_path.split('/').slice(1).join('/'));
 
     if (dlErr) throw dlErr;
 
@@ -83,22 +114,14 @@ module.exports = async function handler(req, res) {
     const mediaTypeMap = { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', gif: 'image/gif', webp: 'image/webp', avif: 'image/avif' };
     const mediaType = mediaTypeMap[ext] || 'image/jpeg';
 
-    // Call Claude
-    const client = new Anthropic();
-    const response = await client.messages.create({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 256,
-      system: SYSTEM_PROMPT,
-      messages: [{
-        role: 'user',
-        content: [
-          { type: 'image', source: { type: 'base64', media_type: mediaType, data: base64 } },
-          { type: 'text', text: 'Tag this image.' },
-        ],
-      }],
-    });
+    // Call chosen provider
+    let raw;
+    if (provider === 'gemini') {
+      raw = await callGemini(base64, mediaType);
+    } else {
+      raw = await callClaude(base64, mediaType);
+    }
 
-    const raw = response.content[0].text.trim();
     let tags;
     try {
       const match = raw.match(/\[.*\]/s);
@@ -141,9 +164,10 @@ module.exports = async function handler(req, res) {
     // Mark as autotagged
     await supabase.from('images').update({ autotagged_at: new Date().toISOString() }).eq('id', id);
 
-    res.json({ tags });
+    res.json({ tags, provider });
   } catch (e) {
     console.error('Autotag error:', e);
     res.status(500).json({ error: e.message });
   }
 };
+

@@ -15,6 +15,7 @@ const state = {
   folders: [],
   moodboards: [],
   allTags: [],
+  provider: 'claude',
   // Autotag batch state
   autotagRunning: false,
   autotagDone: 0,
@@ -416,7 +417,7 @@ $('btn-autotag-single').addEventListener('click', async () => {
   btn.disabled = true;
   btn.textContent = '✦ Tagging…';
   try {
-    await POST(`/autotag/${img.id}`);
+    await POST(`/autotag/${img.id}?provider=${state.provider}`);
     const updated = await GET(`/images/${img.id}`);
     state.images[state.lightboxIndex] = updated;
     renderLightboxTags(updated);
@@ -483,7 +484,7 @@ $('btn-autotag').addEventListener('click', async () => {
     for (const id of ids) {
       $autotagStatus.textContent = `Auto-tagging: ${state.autotagDone}/${state.autotagTotal}…`;
       try {
-        await POST(`/autotag/${id}`);
+        await POST(`/autotag/${id}?provider=${state.provider}`);
       } catch (e) {
         console.warn(`Failed to tag image ${id}:`, e.message);
       }
@@ -503,6 +504,11 @@ $('btn-autotag').addEventListener('click', async () => {
 /* ── Init ── */
 async function init() {
   await Promise.all([loadFolders(), loadMoodboards(), loadTags()]);
+
+  $('provider-select').addEventListener('change', e => {
+    state.provider = e.target.value;
+  });
+
   document.querySelector('.nav-item[data-folder=""]').addEventListener('click', e => {
     e.preventDefault();
     navigate({ folder: '', search: '', tags: [], moodboard: null });
