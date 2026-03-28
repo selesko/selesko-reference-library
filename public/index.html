@@ -69,6 +69,10 @@
             <button class="btn-action" id="btn-add-to-moodboard">Add to Moodboard</button>
             <button class="btn-action btn-clear" id="btn-clear-selection">✕ Clear</button>
           </div>
+          <button class="btn-action" id="btn-toggle-filters">Filters <span>▿</span></button>
+            <button class="btn-action" id="btn-add-to-moodboard">Add to Moodboard</button>
+            <button class="btn-action btn-clear" id="btn-clear-selection">✕ Clear</button>
+          </div>
           <div class="view-toggles">
             <button class="view-toggle active" data-grid="4" title="Large grid">▣</button>
             <button class="view-toggle" data-grid="6" title="Medium grid">⊞</button>
@@ -78,11 +82,8 @@
       </div>
 
       <!-- Tag filter bar -->
-      <div id="tag-filter-bar">
+      <div id="tag-filter-bar" style="display: none;">
         <div id="active-tag-filters"></div>
-        <div id="all-tags-container">
-          <div id="tag-cloud"></div>
-        </div>
       </div>
 
       <!-- Image grid -->
@@ -91,6 +92,19 @@
         <div id="load-more-trigger"></div>
         <div id="empty-state" class="hidden">
           <p>No images found</p>
+        </div>
+      </div>
+
+      <!-- Slide-over filter panel -->
+      <div id="slideover-panel" class="closed">
+        <div class="slideover-header">
+          <h2>Filter & Explore</h2>
+          <button id="slideover-close">✕</button>
+        </div>
+        <div class="slideover-content">
+          <div id="all-tags-container">
+            <div id="tag-cloud"></div>
+          </div>
         </div>
       </div>
     </main>

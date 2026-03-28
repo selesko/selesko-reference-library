@@ -388,13 +388,18 @@ function removeTagFilter(tag) {
 }
 function updateTagFilters() {
   $activeTagFilters.innerHTML = '';
-  state.tags.forEach(tag => {
-    const chip = document.createElement('span');
-    chip.className = 'tag-filter-chip';
-    chip.innerHTML = `${tag}<span class="remove">✕</span>`;
-    chip.addEventListener('click', () => removeTagFilter(tag));
-    $activeTagFilters.appendChild(chip);
-  });
+  if (state.tags.length === 0) {
+    $('tag-filter-bar').style.display = 'none';
+  } else {
+    $('tag-filter-bar').style.display = 'flex';
+    state.tags.forEach(tag => {
+      const chip = document.createElement('span');
+      chip.className = 'tag-filter-chip';
+      chip.innerHTML = `${tag}<span class="remove">✕</span>`;
+      chip.addEventListener('click', () => removeTagFilter(tag));
+      $activeTagFilters.appendChild(chip);
+    });
+  }
   renderTagCloud();
 }
 
@@ -576,6 +581,15 @@ async function init() {
     e.preventDefault();
     navigate({ folder: '', search: '', tags: [], moodboard: null });
   });
+
+  /* Slide-Over Filter Panel Toggle */
+  $('btn-toggle-filters')?.addEventListener('click', () => {
+    $('slideover-panel').classList.toggle('closed');
+  });
+  $('slideover-close')?.addEventListener('click', () => {
+    $('slideover-panel').classList.add('closed');
+  });
+
   await loadImages(false);
 }
 

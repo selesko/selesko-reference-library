@@ -177,7 +177,7 @@ body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: 
 .provider-select-wrap select:focus { border-color: var(--accent-dim); }
 
 /* ── Main ── */
-#main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+#main { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
 
 /* ── Toolbar ── */
 #toolbar {
@@ -292,22 +292,23 @@ body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: 
 
 #tag-cloud { display: flex; flex-direction: column; gap: 12px; width: 100%; }
 
-.tag-category-group { display: flex; flex-direction: column; gap: 6px; }
-.tag-category-title { font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-dim); font-weight: 600; }
-.tag-category-content { display: flex; flex-wrap: wrap; gap: 4px; }
+.tag-category-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
+.tag-category-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text); font-weight: 500; }
+.tag-category-content { display: flex; flex-wrap: wrap; gap: 6px; }
+
 .tag-pill {
   display: inline-block;
-  padding: 2px 8px;
-  background: var(--surface3);
-  color: var(--text-muted);
-  border-radius: 2px;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #ccc;
+  border-radius: 12px;
   font-size: 11px;
   cursor: pointer;
-  border: 1px solid transparent;
-  transition: all 0.1s;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.15s;
 }
-.tag-pill:hover { border-color: var(--accent-dim); color: var(--text); }
-.tag-pill .count { color: var(--text-dim); font-size: 10px; margin-left: 3px; }
+.tag-pill:hover { background: rgba(255, 255, 255, 0.12); color: #fff; border-color: rgba(255, 255, 255, 0.15); }
+.tag-pill .count { color: rgba(255,255,255,0.4); font-size: 10px; margin-left: 4px; }
 
 /* ── Image Grid ── */
 #grid-container {
@@ -647,6 +648,63 @@ body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: 
 .btn-secondary:hover { border-color: var(--text-dim); color: var(--text); }
 
 #modal-moodboard-list { display: flex; flex-direction: column; gap: 6px; max-height: 300px; overflow-y: auto; }
+
+/* ── Slide-Over Panel (Glassmorphism) ── */
+#slideover-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 340px;
+  background: rgba(22, 22, 22, 0.55);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: -8px 0 32px rgba(0, 0, 0, 0.4);
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(0);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#slideover-panel.closed {
+  transform: translateX(100%);
+}
+
+.slideover-header {
+  padding: 24px 20px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.slideover-header h2 {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: var(--text);
+}
+
+#slideover-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px;
+  transition: color 0.15s;
+}
+#slideover-close:hover {
+  color: var(--red);
+}
+
+.slideover-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 20px;
+}
 
 /* ── Utilities ── */
 .hidden { display: none !important; }
