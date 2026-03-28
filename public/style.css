@@ -290,25 +290,27 @@ body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: 
 .tag-filter-chip .remove { font-size: 10px; opacity: 0.7; }
 .tag-filter-chip .remove:hover { opacity: 1; }
 
-#tag-cloud { display: flex; flex-direction: column; gap: 12px; width: 100%; }
+#tag-cloud { display: flex; flex-direction: column; gap: 16px; width: 100%; }
 
-.tag-category-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
-.tag-category-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text); font-weight: 500; }
-.tag-category-content { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag-category-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 4px; }
+.tag-category-title { font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; color: rgba(0,0,0,0.5); font-weight: 600; }
+.tag-category-content { display: flex; flex-wrap: wrap; gap: 8px; }
 
 .tag-pill {
   display: inline-block;
-  padding: 4px 10px;
-  background: rgba(255, 255, 255, 0.05);
-  color: #ccc;
-  border-radius: 12px;
+  padding: 6px 14px;
+  background: rgba(0, 0, 0, 0.04);
+  color: #111;
+  border-radius: 20px; /* heavily rounded pills */
   font-size: 11px;
+  font-weight: 500;
   cursor: pointer;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  transition: all 0.15s;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  transition: all 0.2s;
+  letter-spacing: 0.02em;
 }
-.tag-pill:hover { background: rgba(255, 255, 255, 0.12); color: #fff; border-color: rgba(255, 255, 255, 0.15); }
-.tag-pill .count { color: rgba(255,255,255,0.4); font-size: 10px; margin-left: 4px; }
+.tag-pill:hover { background: rgba(0, 0, 0, 0.08); color: #000; border-color: rgba(0, 0, 0, 0.15); transform: translateY(-1px); }
+.tag-pill .count { color: rgba(0,0,0,0.4); font-size: 10px; margin-left: 6px; }
 
 /* ── Image Grid ── */
 #grid-container {
@@ -652,58 +654,94 @@ body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: 
 /* ── Slide-Over Panel (Glassmorphism) ── */
 #slideover-panel {
   position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
+  top: 16px;
+  right: 16px;
+  bottom: 16px;
   width: 340px;
-  background: rgba(22, 22, 22, 0.55);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border-left: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: -8px 0 32px rgba(0, 0, 0, 0.4);
+  background: rgba(245, 245, 245, 0.75); /* Light frosted glass */
+  backdrop-filter: blur(32px) saturate(180%);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 20px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.3);
   z-index: 50;
   display: flex;
   flex-direction: column;
   transform: translateX(0);
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s;
+  color: #111;
 }
 
 #slideover-panel.closed {
-  transform: translateX(100%);
+  transform: translateX(120%);
+  opacity: 0;
+  pointer-events: none;
 }
 
 .slideover-header {
-  padding: 24px 20px 16px;
+  padding: 24px 24px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .slideover-header h2 {
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  color: var(--text);
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  color: #111;
 }
 
 #slideover-close {
   background: none;
   border: none;
-  color: var(--text-muted);
+  color: rgba(0, 0, 0, 0.4);
   cursor: pointer;
-  font-size: 16px;
+  font-size: 18px;
   padding: 4px;
   transition: color 0.15s;
 }
 #slideover-close:hover {
-  color: var(--red);
+  color: #000;
 }
 
 .slideover-content {
   flex: 1;
   overflow-y: auto;
-  padding: 24px 20px;
+  padding: 24px;
+}
+.slideover-content::-webkit-scrollbar {
+  width: 6px;
+}
+.slideover-content::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 3px;
+}
+
+.slideover-footer {
+  padding: 16px 24px 24px;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+#btn-apply-filters {
+  width: 100%;
+  padding: 14px;
+  background: #1a1a1a;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+#btn-apply-filters:hover {
+  background: #333;
+}
+#btn-apply-filters:active {
+  transform: scale(0.98);
 }
 
 /* ── Utilities ── */

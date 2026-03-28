@@ -589,6 +589,9 @@ async function init() {
   $('slideover-close')?.addEventListener('click', () => {
     $('slideover-panel').classList.add('closed');
   });
+  $('btn-apply-filters')?.addEventListener('click', () => {
+    $('slideover-panel').classList.add('closed');
+  });
 
   await loadImages(false);
 }
