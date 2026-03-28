@@ -33,6 +33,20 @@ function sanitizeKey(key) {
     .replace(/[\*\?\":<>|]/g, '-'); // System reserved
 }
 
+function getSafeRenamePath(dir, ext) {
+  const d = new Date();
+  const pad = n => String(n).padStart(2, '0');
+  const baseName = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}_${pad(d.getHours())}-${pad(d.getMinutes())}-${pad(d.getSeconds())}`;
+  
+  let resultPath = path.join(dir, `${baseName}${ext}`);
+  let counter = 1;
+  while (fs.existsSync(resultPath)) {
+    resultPath = path.join(dir, `${baseName}_${counter}${ext}`);
+    counter++;
+  }
+  return resultPath;
+}
+
 // Wait for a file to stabilise before reading it (Google Drive can write slowly)
 function waitForFile(filePath, timeout = 10000) {
   return new Promise((resolve, reject) => {
@@ -151,11 +165,30 @@ async function main() {
   });
 
   watcher.on('add', async (filePath) => {
-    if (!isImage(path.basename(filePath))) return;
+    const filename = path.basename(filePath);
+    if (!isImage(filename)) return;
+
+    // Check if it already matches the standard Date/Time pattern
+    const isClean = /^\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}(_\d+)?\.[a-zA-Z0-9]+$/.test(filename);
+    if (!isClean) {
+      try {
+        await waitForFile(filePath); // wait for copy to finish before renaming
+        const ext = path.extname(filename).toLowerCase();
+        const newPath = getSafeRenamePath(path.dirname(filePath), ext);
+        fs.renameSync(filePath, newPath);
+        console.log(`  ↻ Renaming to clean datetime format: ${filename} -> ${path.basename(newPath)}`);
+        // Chokidar will natively detect this newly renamed file as a brand new 'add' event.
+        return;
+      } catch (err) {
+        console.error(`  ❌ Failed to rename ${filename}: ${err.message}`);
+        return;
+      }
+    }
+
     try {
       await handleNewImage(filePath);
     } catch (e) {
-      console.error(`  ❌ Error processing ${path.basename(filePath)}: ${e.message}`);
+      console.error(`  ❌ Error processing ${filename}: ${e.message}`);
     }
   });
 
