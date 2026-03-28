@@ -8,68 +8,70 @@
 </head>
 <body>
   <div id="app">
-    <!-- Sidebar -->
-    <aside id="sidebar">
-      <div class="sidebar-header">
+    <!-- Top Navigation -->
+    <header id="top-nav">
+      <div class="nav-brand">
         <div class="logo">SELESKO<br><span>STUDIO</span></div>
       </div>
-
-      <nav class="sidebar-nav">
-        <div class="nav-section">
-          <div class="nav-label">LIBRARY</div>
-          <a href="#" class="nav-item active" data-view="library" data-folder="">
-            <span class="nav-icon">◈</span> All Images
-            <span class="nav-count" id="total-count">—</span>
-          </a>
+      
+      <nav class="nav-links">
+        <a href="#" class="nav-item active" data-view="library" data-folder="">ALL IMAGES</a>
+        
+        <div class="dropdown">
+          <button class="dropdown-toggle" id="btn-folders">FOLDERS <span>▿</span></button>
+          <div class="dropdown-menu">
+            <div id="folder-list"></div>
+          </div>
         </div>
 
-        <div class="nav-section">
-          <div class="nav-label">FOLDERS</div>
-          <div id="folder-list"></div>
-        </div>
-
-        <div class="nav-section">
-          <div class="nav-label">MOODBOARDS</div>
-          <div id="moodboard-list"></div>
-          <button class="btn-new-moodboard" id="btn-new-moodboard">+ New Moodboard</button>
+        <div class="dropdown">
+          <button class="dropdown-toggle" id="btn-moodboards">MOODBOARDS <span>▿</span></button>
+          <div class="dropdown-menu">
+             <div class="dropdown-section-title">Your Boards</div>
+             <div id="moodboard-list"></div>
+             <div class="dropdown-divider"></div>
+             <button class="dropdown-action" id="btn-new-moodboard">+ New Moodboard</button>
+          </div>
         </div>
       </nav>
 
-      <div class="sidebar-footer">
+      <div class="nav-actions">
         <div class="provider-select-wrap">
-          <label for="provider-select">AI Provider</label>
           <select id="provider-select">
-            <option value="claude">Claude (Haiku)</option>
-            <option value="gemini">Gemini (Flash)</option>
+            <option value="claude">Claude</option>
+            <option value="gemini">Gemini</option>
           </select>
         </div>
-        <button class="btn-autotag" id="btn-autotag">
-          <span>✦</span> Auto-Tag All
-        </button>
-        <div id="autotag-status" class="autotag-status hidden"></div>
+        <button class="btn-autotag" id="btn-autotag">✦ Auto-Tag</button>
+        <button class="btn-action filter-btn" id="btn-toggle-filters">FILTERS <span>▿</span></button>
       </div>
-    </aside>
+      <div id="autotag-status" class="autotag-status hidden"></div>
+    </header>
 
     <!-- Main content -->
     <main id="main">
-      <!-- Toolbar -->
-      <div id="toolbar">
-        <div class="toolbar-left">
+      <!-- Hero Search Area -->
+      <section id="hero-search-area">
+        <div class="search-wrap-hero">
+          <span class="search-icon">⌕</span>
+          <input type="text" id="search-input" placeholder="Search reference library...">
+        </div>
+        <div id="tag-filter-bar" style="display: none;">
+          <span class="popular-tags-label">ACTIVE TAGS:</span>
+          <div id="active-tag-filters"></div>
+        </div>
+      </section>
+
+      <!-- Subheader & Actions -->
+      <div id="subheader">
+        <div class="subheader-left">
           <h1 id="view-title">All Images</h1>
+          <span class="nav-count" id="total-count">—</span>
         </div>
-        <div class="toolbar-center">
-          <div class="search-wrap">
-            <input type="text" id="search-input" placeholder="Search by name or tag…">
-            <span class="search-icon">⌕</span>
-          </div>
-        </div>
-        <div class="toolbar-right">
+        
+        <div class="subheader-right">
           <div id="selection-bar" class="hidden">
             <span id="selection-count">0 selected</span>
-            <button class="btn-action" id="btn-add-to-moodboard">Add to Moodboard</button>
-            <button class="btn-action btn-clear" id="btn-clear-selection">✕ Clear</button>
-          </div>
-          <button class="btn-action" id="btn-toggle-filters">Filters <span>▿</span></button>
             <button class="btn-action" id="btn-add-to-moodboard">Add to Moodboard</button>
             <button class="btn-action btn-clear" id="btn-clear-selection">✕ Clear</button>
           </div>
@@ -81,17 +83,12 @@
         </div>
       </div>
 
-      <!-- Tag filter bar -->
-      <div id="tag-filter-bar" style="display: none;">
-        <div id="active-tag-filters"></div>
-      </div>
-
       <!-- Image grid -->
       <div id="grid-container">
         <div id="image-grid"></div>
         <div id="load-more-trigger"></div>
         <div id="empty-state" class="hidden">
-          <p>No images found</p>
+          <p>No images found.</p>
         </div>
       </div>
 

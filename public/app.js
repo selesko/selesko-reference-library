@@ -116,27 +116,37 @@ function renderImages(images, append) {
     card.dataset.id  = img.id;
     card.dataset.idx = globalIdx;
 
+    const wrapper = document.createElement('div');
+    wrapper.className = 'img-wrapper';
+
     const imgEl = document.createElement('img');
     imgEl.loading = 'lazy';
     imgEl.src = thumbUrl(img);
     imgEl.alt = img.filename;
 
-    const overlay = document.createElement('div');
-    overlay.className = 'img-overlay';
+    wrapper.appendChild(imgEl);
+
+    const meta = document.createElement('div');
+    meta.className = 'img-meta';
+
+    const title = document.createElement('div');
+    title.className = 'img-title';
+    title.textContent = img.filename.replace(/\.[^/.]+$/, ""); // strip extension for cleaner look
+
+    const subtitle = document.createElement('div');
+    subtitle.className = 'img-subtitle';
     if (img.tags?.length) {
-      const tagWrap = document.createElement('div');
-      tagWrap.className = 'img-overlay-tags';
-      img.tags.slice(0, 4).forEach(t => {
-        const span = document.createElement('span');
-        span.className = 'img-overlay-tag';
-        span.textContent = t.name;
-        tagWrap.appendChild(span);
-      });
-      overlay.appendChild(tagWrap);
+      subtitle.textContent = img.tags.slice(0, 3).map(t => t.name).join(' • ');
+    } else {
+      subtitle.textContent = img.folder || 'Untagged';
     }
 
-    card.appendChild(imgEl);
-    card.appendChild(overlay);
+    meta.appendChild(title);
+    meta.appendChild(subtitle);
+
+    card.appendChild(wrapper);
+    card.appendChild(meta);
+
     card.addEventListener('click', e => {
       if (e.shiftKey || state.selected.size > 0) toggleSelect(img.id, card);
       else openLightbox(globalIdx);
@@ -233,7 +243,7 @@ function renderFolders() {
     a.href = '#';
     a.className = 'nav-item' + (state.folder === f.folder ? ' active' : '');
     a.dataset.folder = f.folder;
-    a.innerHTML = `<span class="nav-icon">▸</span>${folderLabel(f.folder)}<span class="nav-count">${f.count}</span>`;
+    a.innerHTML = `${folderLabel(f.folder)}`;
     a.addEventListener('click', e => { e.preventDefault(); navigate({ folder: f.folder, search: state.search, tags: [], moodboard: null }); });
     $folderList.appendChild(a);
   });
@@ -252,7 +262,7 @@ function renderMoodboards() {
     a.href = '#';
     a.className = 'nav-item' + (state.moodboard === m.id ? ' active' : '');
     a.dataset.moodboard = m.id;
-    a.innerHTML = `<span class="nav-icon">◻</span>${m.name}<span class="nav-count">${m.image_count}</span>
+    a.innerHTML = `${m.name}
       <button class="moodboard-delete" data-id="${m.id}" title="Delete">✕</button>`;
     a.addEventListener('click', e => {
       if (e.target.classList.contains('moodboard-delete')) { e.preventDefault(); deleteMoodboard(m.id); return; }
@@ -501,18 +511,13 @@ $('btn-autotag-single').addEventListener('click', async () => {
 function updateCardTags(imageId, tags) {
   const card = $grid.querySelector(`[data-id="${imageId}"]`);
   if (!card) return;
-  const overlay = card.querySelector('.img-overlay');
-  overlay.innerHTML = '';
-  if (tags?.length) {
-    const tagWrap = document.createElement('div');
-    tagWrap.className = 'img-overlay-tags';
-    tags.slice(0, 4).forEach(t => {
-      const span = document.createElement('span');
-      span.className = 'img-overlay-tag';
-      span.textContent = t.name;
-      tagWrap.appendChild(span);
-    });
-    overlay.appendChild(tagWrap);
+  const subtitle = card.querySelector('.img-subtitle');
+  if (subtitle) {
+    if (tags?.length) {
+      subtitle.textContent = tags.slice(0, 3).map(t => t.name).join(' • ');
+    } else {
+      subtitle.textContent = 'Untagged';
+    }
   }
 }
 
