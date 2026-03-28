@@ -93,7 +93,7 @@ module.exports = async function handler(req, res) {
     // Fetch image record
     const { data: img, error: imgErr } = await supabase
       .from('images')
-      .select('id, filename, storage_path')
+      .select('id, filename, filepath, storage_path')
       .eq('id', id)
       .single();
 
@@ -101,9 +101,12 @@ module.exports = async function handler(req, res) {
     if (!img.storage_path) return res.status(400).json({ error: 'Image not yet uploaded to storage' });
 
     // Download image from Supabase Storage
+    // Use filepath as the storage key — storage_path is a full public URL, not a bucket key
+    const storageKey = img.filepath
+      .replace(/\u202f/g, ' ').replace(/—/g, '-').replace(/[^\x20-\x7E]/g, '-').replace(/[\*\?\":<>|]/g, '-');
     const { data: fileData, error: dlErr } = await supabase.storage
       .from('images')
-      .download(img.storage_path.split('/').slice(1).join('/'));
+      .download(storageKey);
 
     if (dlErr) throw dlErr;
 
