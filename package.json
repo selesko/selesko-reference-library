@@ -5,7 +5,9 @@
   "scripts": {
     "start": "vercel dev",
     "upload": "node scripts/upload.js",
-    "watch": "node scripts/watch.js"
+    "watch": "node scripts/watch.js",
+    "deploy": "wrangler deploy",
+    "preview": "wrangler dev"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
@@ -16,6 +18,7 @@
     "sharp": "^0.33.5"
   },
   "devDependencies": {
-    "vercel": "^39.0.0"
+    "vercel": "^39.0.0",
+    "wrangler": "^4.87.0"
   }
 }
